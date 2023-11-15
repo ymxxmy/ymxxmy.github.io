@@ -1,0 +1,300 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>负载均衡 | 明明的博客</title><meta name="author" content="MinDa"><meta name="copyright" content="MinDa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="负载均衡-lvs\nginx\haproxy负载均衡（LB）：灵活分配客户端请求，均衡地分不到其他服务器上，减轻单个服务器上的负担。 负载均衡一般分为三类：DNS方式实现负载均衡、硬件负载均衡、软件负载均衡。 4层负载均衡：负载均衡服务器将只解析到四层，负载均衡设备与client客户端三次握手后就会和RS（真实服务器）建立连接。 7层负载均衡：负载均衡器将解析到7层应用层数据，在负载均衡服务器与客">
+<meta property="og:type" content="article">
+<meta property="og:title" content="负载均衡">
+<meta property="og:url" content="http://example.com/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/index.html">
+<meta property="og:site_name" content="明明的博客">
+<meta property="og:description" content="负载均衡-lvs\nginx\haproxy负载均衡（LB）：灵活分配客户端请求，均衡地分不到其他服务器上，减轻单个服务器上的负担。 负载均衡一般分为三类：DNS方式实现负载均衡、硬件负载均衡、软件负载均衡。 4层负载均衡：负载均衡服务器将只解析到四层，负载均衡设备与client客户端三次握手后就会和RS（真实服务器）建立连接。 7层负载均衡：负载均衡器将解析到7层应用层数据，在负载均衡服务器与客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg">
+<meta property="article:published_time" content="2023-01-02T08:37:30.000Z">
+<meta property="article:modified_time" content="2023-01-02T08:52:59.606Z">
+<meta property="article:author" content="MinDa">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '负载均衡',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-02 16:52:59'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.2"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-book"></i><span> 书籍</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">明明的博客</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-book"></i><span> 书籍</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">负载均衡</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-01-02T08:37:30.000Z" title="发表于 2023-01-02 16:37:30">2023-01-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-01-02T08:52:59.606Z" title="更新于 2023-01-02 16:52:59">2023-01-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="负载均衡"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="负载均衡-lvs-nginx-haproxy"><a href="#负载均衡-lvs-nginx-haproxy" class="headerlink" title="负载均衡-lvs\nginx\haproxy"></a><strong>负载均衡-lvs\nginx\haproxy</strong></h1><p>负载均衡（LB）：灵活分配客户端请求，均衡地分不到其他服务器上，减轻单个服务器上的负担。</p>
+<p>负载均衡一般分为三类：DNS方式实现负载均衡、硬件负载均衡、软件负载均衡。</p>
+<p>4层负载均衡：负载均衡服务器将只解析到四层，负载均衡设备与client客户端三次握手后就会和RS（真实服务器）建立连接。</p>
+<p>7层负载均衡：负载均衡器将解析到7层应用层数据，在负载均衡服务器与客户端三次握手之后，只有收到对应的7层数据报文，才会跟RS真是服务器建立连接。</p>
+<h2 id="DNS实现负载均衡"><a href="#DNS实现负载均衡" class="headerlink" title="DNS实现负载均衡"></a><strong>DNS实现负载均衡</strong></h2><p>一个域名通过DNS解析到多个IP，每个IP对应不同的服务器实例。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672648862549.png" alt="1672648862549"></p>
+<p>实现简单、成本低、无需自己开发和维护负载均衡设备。</p>
+<p>缺点：</p>
+<p>服务器故障切换延迟大，服务器升级不方便：因为用户与DNS之间是层层的缓存</p>
+<p>流量调度不均衡，粒度太粗：受地区运营商返回IP列表的策略有关系</p>
+<p>流量分配策略较简单，支持的算法较少：DNS只支持RR的轮询方式</p>
+<p>DNS支持的IP列表有限制：DNS是UDP传输的，受链路的MTU限制，因此报文中存储的IP地址列表是有限的。如阿里云DNS系统同一个域名只支持10个IP地址。</p>
+<p>该种方式较少使用。</p>
+<h2 id="硬件负载均衡"><a href="#硬件负载均衡" class="headerlink" title="硬件负载均衡"></a><strong>硬件负载均衡</strong></h2><p>通过专门的硬件来实现负载均衡，类似交换机与路由器，是一个负载均衡专用的网络设备。</p>
+<p>典型两款硬件负载均衡设备为：<strong>F5、A10</strong></p>
+<p><strong>优点：</strong></p>
+<p>功能强大：全面支持各层级的负载均衡以及全面的负载均衡算法</p>
+<p>性能强大：远超常见的软件负载均衡器</p>
+<p>稳定性高</p>
+<p>安全防护高：会具备防火墙、抗ddos攻击等，还支持SNAT功能</p>
+<p><strong>缺点：</strong></p>
+<p>价格贵</p>
+<p>扩展性差</p>
+<p>调试与维护较麻烦</p>
+<h2 id="软件负载均衡"><a href="#软件负载均衡" class="headerlink" title="软件负载均衡"></a><strong>软件负载均衡</strong></h2><p>可以在普通服务器上运行负载均衡软件实现负载均衡功能。</p>
+<p>主要有：Nginx、HAproxy、LVS</p>
+<p>Nginx：起初是7层负载均衡，目前也支持4层的负载均衡</p>
+<p>HAproxy：7层负载均衡，支持7层规则的设置，OpenStack默认使用的负载均衡软件就是HAproxy</p>
+<p>LVS：纯4层负载均衡，运行在内核态，性能也是这几者之间最高的。</p>
+<p>优点主要是：简单、便宜且灵活（有4层与7层的负载均衡进行选择）</p>
+<h3 id="LVS"><a href="#LVS" class="headerlink" title="LVS"></a><strong>LVS</strong></h3><p>lvs是基于4层的负载均衡器，工作在传输层，无法做到URL解析工作，支持TCP UDP的负载均衡（主要是通过报文中的目的地址与端口进行处理）。</p>
+<p>是基于linux内核中netfilter框架实现的负载均衡系统。</p>
+<h4 id="netfilter简单了解"><a href="#netfilter简单了解" class="headerlink" title="netfilter简单了解"></a><strong>netfilter简单了解</strong></h4><p>通常我们使用的linux防火墙如iptables等，其实到后台真正起作用的都是netfilter。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672648961058.png" alt="1672648961058"> </p>
+<p>netfilter是内核态的linux防火墙机制，提供如数据包过滤、网络地址转换、基于协议类型的连跟踪的功能。数据包流经进入系统后，netfilter主要有5个状态点：PRROUTING、INPUT、FORWORD、OUTPUT、POSTROUTING</p>
+<p>PREROUTING：刚进入网络层，还没进行路由查找的数据包</p>
+<p>INPUT：通过路由查找，确定发往本机的数据包</p>
+<p>FORWORD：经过路由查找后，需要转发的数据包，该状态点在POSTROUTING之前</p>
+<p>OUTPUT：从本机进程发出的数据包，通过此处</p>
+<p>POSTROUTING：进行网络层已经经过路由查找，确定转发，将要离开本设备的数据包</p>
+<p>如果网络数据包是要发给本机，则在设备中由PREROUTING—-&gt;INPUT—-&gt;OUTPUT—-&gt;POSTROUTING；</p>
+<p>如果目的IP不是本机，则在设备中由PREROUTING—-&gt;FORORD—-&gt;POSTROUTING</p>
+<h4 id="LVS基本介绍"><a href="#LVS基本介绍" class="headerlink" title="LVS基本介绍"></a><strong>LVS基本介绍</strong></h4><p>LVS基于netfilter框架，主要工作于INPUT链上，在INPUT上注册ip_vs_in HOOK函数，进行IPVS主流程：</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672648984873.png" alt="1672648984873"> </p>
+<p>示例流程：</p>
+<p>1、用户访问网站，数据包通过层层网络，最后只能够通过交换机进入LVS服务器网卡，并进入内核网络层；</p>
+<p>2、进入PREROUTINNG后经过路由查找，确定访问的目的IP VIP是本地地址，那么数据包将会进入到INPUT链上；</p>
+<p>3、IPVS工作在INPUT链上，会根据访问的 vip+port 判断请求是否 IPVS 服务，如果是则调用注册的 IPVS HOOK 函数，进行 IPVS 相关主流程，<strong>强行修改数据包的相关数据</strong>，并将数据包发往 POSTROUTING 链上。</p>
+<p>4、POSTROUTING收到数据包，根据目的IP地址（真实的服务器），通过路由选址，将数据包最终发给后端真实的服务器。</p>
+<p>LVS主要工作模式：</p>
+<p><strong>1）DR模式：修改目标MAC。</strong></p>
+<p><strong>2）NAT模式：修改IP地址，分为源地址修改SNAT，目的地址修改DNAT。</strong></p>
+<p><strong>3）Tunnel模式</strong></p>
+<p><strong>4）FullNAT模式</strong>：该模式还未合入内核主线。</p>
+<h5 id="DR模式"><a href="#DR模式" class="headerlink" title="DR模式"></a><strong>DR模式</strong></h5><p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649013164.png" alt="1672649013164"> </p>
+<p>示例流程如下：</p>
+<p>1）客户端请求服务器，数据包经过层层网络到达负载均衡服务器LVS，此时源IP为客户端IP地址（CIP），目的IP地址为服务器设备对外的网络IP地址（VIP），源MAC为LVS服务器上一跳的MAC地址（CMAC），目的MAC为VIP对应的MAC地址（VMAC）；</p>
+<p>2）数据包到达网卡，经过PREROUTING位置（刚进入网络层），进行路由查找，发现目的IP是LVS的VIP，将会将数据包传给INPUT链上，此时的4元组没有修改；</p>
+<p>3）数据包到达INPUT链上，LVS通过目的IP与port端口确认是否为LVS定义的服务，若是则会根据配置的service信息，在真实的realserver中选择一个做为后面的真实后端服务器，再根据真实的后端服务器查找OUT方向的路由，确定下一跳以及从哪个网卡出。最后数据包通过inet_hook到OUTPUT链上（OUT刚从四层进入网络层）；</p>
+<p>4）数据包通过POSTROUTING链，从网络层转到链路层，将目的MAC修改为真实服务器的MAC地址（RMAC），源Mac地址修改为LVS与服务器通信的网卡MAC地址（DMAC），再将数据包通过网络发给真实服务器；</p>
+<p>5）请求包到达服务器后，链路层查找目的MAC是自己的MAC地址，查找路由，目的IP是VIP（服务器的lo上配置了VIP），确定是本机IP后，将会拷贝至应用程序。服务器应用程序处理请求，产生响应后，查找路由，发送响应数据包，此时源IP、目的IP分别是VIP、CIP，源MAC、目的MAC分别是真实服务器的网卡MAC（RMAC）、服务器下一跳的MAC地址（CMAC）。最后数据包通过与服务器相连的网络设备发送给客户端，不经过LVS服务器。</p>
+<p>此模式最大的特点是<strong>响应包数据不经过LVS服务器</strong>，直接通过网络发送给客户端，由于请求包较小，因此DR模式的性能较高。</p>
+<p><strong>优缺点对比：</strong></p>
+<p>优点：</p>
+<p>响应数据不过LVS，性能高</p>
+<p>数据修改小，信息保存完整（携带客户端IP）</p>
+<p>缺点：</p>
+<p>LVS与真实的服务器需在同一个物理网络</p>
+<p>真实服务器必须配置lo和其他内核参数</p>
+<p>不支持端口映射</p>
+<p>较适合性能追求高，且透传客户端IP地址的场景。</p>
+<h5 id="NAT模式"><a href="#NAT模式" class="headerlink" title="NAT模式"></a><strong>NAT模式</strong></h5><p>lvs需要做真实服务器的网关。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649039716.png" alt="1672649039716"></p>
+<p>实现过程如下：</p>
+<p>1、用户请求经过网络到达lvs，此时源IP为客户端IP（CIP），目的IP是lvs的VIP；</p>
+<p>2、经过网卡进入网络层prerouting位置，确认目的IP是否为本地IP，若是则将数据包发往INPUT，此时源目的都未变化；</p>
+<p>3、到达lvs后，通过目的IP与目的端口查找是否为ipvs服务。若是则选择一个真实服务器作为后端服务器，并将目的IP修改为服务器IP（RIP），以此查找路由信息，将数据包转发至OUTPUT上；</p>
+<p>4、经过postrouting和链路层处理后，到达真实服务器，此时的源目的IP与上一步相同；</p>
+<p>5、到达真实服务器作处理后，将响应数据发送给下一跳（真实服务器上默认网关配置应为lvs设备IP），此时数据包源IP为RIP，目的IP为CIP（只是下一跳地址指向lvs）</p>
+<p>6、lvs收到后，经过路由查找，判断不是本机IP，将数据包转发至forward链，此时数据包未做修改</p>
+<p>7、lvs收到后根据目的IP与目的端口查找服务和连接表，将源IP改为VIP，通过路由查找确定下一跳，将数据包发往网关，再由网络到达客户端。</p>
+<p>Nat模式双向流量都经过lvs,会修改传输过程中的IP地址。</p>
+<p><strong>优缺点分析：</strong></p>
+<p>优点：</p>
+<p>1）支持Windows</p>
+<p>2）支持端口映射（如果真实服务器的端口与vport不一致，lvs除了修改目的IP外也会修改目的端口支持端口映射）</p>
+<p>缺点：</p>
+<p>1）后端真实服务器需要配置网关（为lvs服务器IP）</p>
+<p>2）双向流量导致性能不高</p>
+<p>3）若是windows系统使用lvs，则必须使用NAT模式。</p>
+<p><strong>NAT模式中真实服务器通过指定路由为lvs服务器使响应数据经过lvs发往客户端。数据包先到达lvs做DNAT处理，将目的IP修改为真实服务器IP，响应数据返回到达lvs后做SNAT处理，将源IP修改为VIP。</strong></p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649056930.png" alt="1672649056930"></p>
+<h5 id="Tunnel模式"><a href="#Tunnel模式" class="headerlink" title="Tunnel模式"></a><strong>Tunnel模式</strong></h5><p>tunnel模式也只有请求会通过lvs,响应数据直接从后端服务器发送给客户端，性能较高且支持跨机房。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649103440.png" alt="1672649103440"> </p>
+<p>实现过程如下：</p>
+<p>1、用户请求经过网络到达lvs，此时源IP为客户端IP（CIP），目的IP是lvs的VIP；</p>
+<p>2、经过网卡进入网络层prerouting位置，确认目的IP是否为本地IP，若是则将数据包发往INPUT，此时源目的都未变化；</p>
+<p>3、到达lvs后，通过目的IP与目的端口查找是否为ipvs服务。若是则选择一个真实服务器作为后端服务器，以RIP查找路由信息，然后在IP头部前额外增加一个IP头： DIP（表示负载均衡与后端服务器通信的 IP 地址。）为源，RIP为目的，最后将数据包转发至OUTPUT上；</p>
+<p>4、经过postrouting和链路层处理后，到达真实服务器，此时的IP头与上一步相同；</p>
+<p>5、到达真实服务器后，ipip模块将tunnel头部卸载掉，看到正常的源目的为CIP，VIP；由于在真实服务器上的tunl0上配置了IP为VIP，将会将数据包发往本机应用程序进行处理，最后将响应数据发出网卡，此时数据包源IP为VIP，目的IP为CIP，最终由网络到达客户端。</p>
+<p><strong>优缺点分析：</strong></p>
+<p>优点：</p>
+<p>1）lvs负载压力小，性能高</p>
+<p>2）数据包修改小，信息保存完整</p>
+<p>3）可跨机房</p>
+<p>缺点：</p>
+<p>1）后段服务器需安装ipip模块，需在tunl0配置VIP</p>
+<p>2）隧道头部IP段的加入可能导致分片，影响服务器性能</p>
+<p>3）隧道头部IP地址固定，后段服务器网卡hash可能不均</p>
+<p>4）不支持端口映射</p>
+<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a><strong>Nginx</strong></h3><p>实现7层负载均衡，也称为“内容交换”，也就是主要通过报文中的真正有意义的应用层内容。主要是对7层中的http\https进行支持。</p>
+<p>Nginx 的架构设计是采用模块化的、基于事件驱动、异步、单线程且非阻塞。nginx大量使用多路复用和事件通知，Nginx 启动以后，会在系统中以 daemon 的方式在后台运行，其中<strong>包括一个 master 进程，n(n&gt;=1) 个 worker 进程</strong>。所有的进程<strong>都是单线程</strong>（即只有一个主线程）的，且<strong>进程间通信主要使用共享内存</strong>的方式。</p>
+<p>master进程用于接收外界信号，并将信号发送给worker进程，并可以监控worker进程状态。其中worker进程是请求的真正处理者，每个worker相互独立且平等的竞争请求。<strong>每一个请求只能在一个worker进程中做处理，且每个worker进程同时只能处理一个请求。</strong></p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649130604.png" alt="1672649130604"> </p>
+<p>Nginx以反向代理模式实现负载均衡，此时的nginx对外表现得像服务器。目前nginx也可以实现正向代理模式。</p>
+<h4 id="Nginx负载均衡方式"><a href="#Nginx负载均衡方式" class="headerlink" title="Nginx负载均衡方式"></a><strong>Nginx负载均衡方式</strong></h4><p><strong>1、轮询：默认模式</strong></p>
+<p>所有请求按照时间顺序进行分配，通过时间顺序分配到不同的服务器上。如果服务器down掉，可以自动剔除。</p>
+<p>如下图所示，轮询10001与10002的服务</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649152668.png" alt="1672649152668"> </p>
+<p><strong>2、权重模式</strong></p>
+<p>通过指定每个服务的权重比例，权重与访问比率成正比。</p>
+<p>用于后端服务器性能不统一的情况，将性能好的服务器分配高权重，以实现服务器的最高性能。</p>
+<p>配置如下图所示：</p>
+<p>10002服务的访问比率比10001服务的访问比率高2倍。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649165202.png" alt="1672649165202"> </p>
+<p><strong>3、ip hash模式：</strong></p>
+<p>每个请求根据访问ip的hash结果进行分配，这样每个访客可固定访问一个后端服务器，可以解决session的问题（可以和权重配合使用）。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649178765.png" alt="1672649178765"> </p>
+<p><strong>4、最少连接模式</strong></p>
+<p>将请求分配给连接数最少的服务器上。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649213013.png" alt="1672649213013"></p>
+<p><strong>5、fair模式</strong></p>
+<p>按照后端服务器的响应时间来进行分配，响应时间短的优先分配。</p>
+<p><img src="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/1672649225591.png" alt="1672649225591"> </p>
+<p><strong>6、url_hash模式</strong></p>
+<p>按照url的hash结果分配请求，使每个url定向到同一个后端服务器，后端服务器为缓存时比较有效。</p>
+<h4 id="Nginx负载均衡优缺点分析"><a href="#Nginx负载均衡优缺点分析" class="headerlink" title="Nginx负载均衡优缺点分析"></a>Nginx负载均衡优缺点分析</h4><p>优点：</p>
+<p>跨平台</p>
+<p>配置简单</p>
+<p>非阻塞、高并发连接</p>
+<p>事件驱动，支持更大的并发连接</p>
+<p>master\worker结构：一个master生成多个worker进程</p>
+<p>内存消耗小：在3万并发连接下，开启的10个 Nginx 进程才消耗150M 内存（15M*10=150M）</p>
+<p>内置健康检查功能</p>
+<p>带宽节省</p>
+<p>稳定性高</p>
+<p>缺点：</p>
+<p>目前仅能支持http\https以及email协议，适用范围较小；</p>
+<p>对后端服务器的健康检查，只支持通过端口来检测，不支持通过 ur l来检测。不支持 Session 的直接保持，但能通过 ip_hash 来解决。</p>
+<h3 id="HAProxy模式"><a href="#HAProxy模式" class="headerlink" title="HAProxy模式"></a>HAProxy模式</h3><p>HAProxy支持两种负载均衡，既支持4层也支持7层，同时也支持虚拟主机的。</p>
+<p>HAProxy对nginx来说，可以解决nginx的一些缺点：支持 Session 的保持，Cookie 的引导；同时支持通过获取指定的 url 来检测后端服务器的状态。</p>
+<p>HAProxy 负载均衡策略非常多：Round-robin（轮循）、Weight-round-robin（带权轮循）、source（原地址保持）、RI（请求URL）、rdp-cookie（根据cookie）。</p>
+<p>HAProxy本身是做负载均衡的，不像nginx还可疑做代理，因此HAProxy的性能较高于nginx。</p>
+<p>链接文章：</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/VWBDoa5eCEH64zcs2V4_jQ"><strong>https://mp.weixin.qq.com/s/VWBDoa5eCEH64zcs2V4_jQ</strong></a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/KnsLJd4W_I4gc8ZSRIbxrQ">https://mp.weixin.qq.com/s/KnsLJd4W_I4gc8ZSRIbxrQ</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">MinDa</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">http://example.com/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">明明的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/12/12/hello-world/"><img class="next-cover" src="/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Hello World</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">MinDa</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1-lvs-nginx-haproxy"><span class="toc-number">1.</span> <span class="toc-text">负载均衡-lvs\nginx\haproxy</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DNS%E5%AE%9E%E7%8E%B0%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">1.1.</span> <span class="toc-text">DNS实现负载均衡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">1.2.</span> <span class="toc-text">硬件负载均衡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">1.3.</span> <span class="toc-text">软件负载均衡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LVS"><span class="toc-number">1.3.1.</span> <span class="toc-text">LVS</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#netfilter%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">netfilter简单了解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LVS%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">LVS基本介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#DR%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.3.1.2.1.</span> <span class="toc-text">DR模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#NAT%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.3.1.2.2.</span> <span class="toc-text">NAT模式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Tunnel%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.3.1.2.3.</span> <span class="toc-text">Tunnel模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nginx"><span class="toc-number">1.3.2.</span> <span class="toc-text">Nginx</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E6%96%B9%E5%BC%8F"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">Nginx负载均衡方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BC%98%E7%BC%BA%E7%82%B9%E5%88%86%E6%9E%90"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">Nginx负载均衡优缺点分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HAProxy%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.3.3.</span> <span class="toc-text">HAProxy模式</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" title="负载均衡"><img src="/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="负载均衡"/></a><div class="content"><a class="title" href="/2023/01/02/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" title="负载均衡">负载均衡</a><time datetime="2023-01-02T08:37:30.000Z" title="发表于 2023-01-02 16:37:30">2023-01-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/12/12/hello-world/" title="Hello World"><img src="/img/%E7%B2%89%E8%89%B2%E7%B3%BB.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2022/12/12/hello-world/" title="Hello World">Hello World</a><time datetime="2022-12-12T15:07:43.771Z" title="发表于 2022-12-12 23:07:43">2022-12-12</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By MinDa</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
